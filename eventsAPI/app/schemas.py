@@ -1,8 +1,4 @@
-from flask import Flask
-from flask_marshmallow import Marshmallow
-
-# app = Flask(__name__)
-ma = Marshmallow()
+from app import ma
 
 # Datetime Schema
 class DatetimeSchema(ma.Schema):
