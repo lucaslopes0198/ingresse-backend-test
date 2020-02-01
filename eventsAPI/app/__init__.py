@@ -4,7 +4,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from datetime import datetime
 
-# local import
 from instance.config import app_config
 
 # initialize sql-alchemy
@@ -28,8 +27,7 @@ def create_app(config_name):
         name = request.json['name']
         place = request.json['place']
         interested = 0
-        # datetimes = request.json['datetime']
-        datetimes = [datetime(2015, 6, 5, 10, 20, 10, 10), datetime(2015, 6, 5, 10, 20, 10, 10)]
+        datetimes = [datetime.strptime(dt, '%d/%m/%y %H:%M:%S') for dt in request.json['datetimes']]
         tags = request.json['tags']
 
         new_event = Event(name, place, interested)
@@ -48,7 +46,7 @@ def create_app(config_name):
 
     # Get All Events
     @app.route('/events', methods=['GET'])
-    def fetch_all_events():
+    def get_all_events():
         all_events = Event.query.all()
         result = events_schema.dump(all_events)
         return jsonify(result)

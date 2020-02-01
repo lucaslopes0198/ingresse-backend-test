@@ -12,6 +12,7 @@ flask-marshmallow = "*"
 marshmallow-sqlalchemy = "*"
 pipfile = "*"
 python-dotenv = "*"
+flask-api = "*"
 
 [requires]
 python_version = "3.7"
