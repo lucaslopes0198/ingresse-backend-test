@@ -21,7 +21,6 @@ def create_app(config_name):
     db.init_app(app)
     ma.init_app(app)
 
-    # Create a Event
     @app.route('/events', methods=['POST'])
     def add_event():
         name = request.json['name']
@@ -44,20 +43,18 @@ def create_app(config_name):
 
         return event_schema.jsonify(new_event)
 
-    # Get All Events
     @app.route('/events', methods=['GET'])
     def get_all_events():
         all_events = Event.query.all()
         result = events_schema.dump(all_events)
         return jsonify(result)
 
-    # Get Filtered Events
     @app.route('/events/filters', methods=['POST'])
     def get_filtered_events():
-        search_name = "%{}%".format(request.json['name'])
-        search_place = "%{}%".format(request.json['place'])
-        search_tags = request.json['tags']
-        search_dt = [datetime.strptime(dt, '%d/%m/%y %H:%M:%S') for dt in request.json['datetimes']]
+        search_name = "%{}%".format(request.json.get('name', ''))
+        search_place = "%{}%".format(request.json.get('place', ''))
+        search_tags = request.json.get('tags', '')
+        search_dt = request.json.get('datetimes', '')
         query = Event.query\
             .join(Tag, Event.id==Tag.event_id)\
             .join(Datetime, Event.id==Datetime.event_id)\
@@ -66,9 +63,48 @@ def create_app(config_name):
         if search_tags:
             query = query.filter(Tag.tag.in_(search_tags))
         if search_dt:
-            query = query.filter(Datetime.datetime.between(search_dt[0], search_dt[1]))
+            converted_dt = [datetime.strptime(dt, '%d/%m/%y %H:%M:%S') for dt in search_dt]
+            query = query.filter(Datetime.datetime.between(converted_dt[0], converted_dt[1]))
         filtered_events = query.all()
         result = events_schema.dump(filtered_events)
+        return jsonify(result)
+
+    @app.route('/events/<int:id>', methods=['PUT'])
+    def update_event(id, **kwargs):
+        event = Event.query.filter_by(id=id).first()
+        
+        interested = request.json.get('interested', '')
+        if interested:
+            event.interested += 1
+            db.session.add(event)
+            db.session.commit()
+            result = event_schema.dump(event)
+            return jsonify(result)
+
+        name_update = request.json.get('name', '')
+        place_update = request.json.get('place', '')
+        tags_update = request.json.get('tags', '')
+        dt_update = request.json.get('datetimes', '')
+
+        if name_update:
+            event.name = name_update
+        if place_update:
+            event.place = place_update
+        db.session.add(event)
+
+        if tags_update:
+            Tag.query.filter_by(event_id=id).delete()
+            tags_updated = [Tag(t, id) for t in tags_update]
+            db.session.bulk_save_objects(tags_updated)
+
+        if dt_update:
+            Datetime.query.filter_by(event_id=id).delete()
+            converted_dt = [datetime.strptime(dt, '%d/%m/%y %H:%M:%S') for dt in dt_update]
+            dt_updated = [Datetime(dt, id) for dt in converted_dt]
+            db.session.bulk_save_objects(dt_updated)
+
+        db.session.commit()
+        result = event_schema.dump(event)
         return jsonify(result)
 
     return app
