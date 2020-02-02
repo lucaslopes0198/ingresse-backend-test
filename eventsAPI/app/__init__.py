@@ -51,4 +51,24 @@ def create_app(config_name):
         result = events_schema.dump(all_events)
         return jsonify(result)
 
+    # Get Filtered Events
+    @app.route('/events/filters', methods=['POST'])
+    def get_filtered_events():
+        search_name = "%{}%".format(request.json['name'])
+        search_place = "%{}%".format(request.json['place'])
+        search_tags = request.json['tags']
+        search_dt = [datetime.strptime(dt, '%d/%m/%y %H:%M:%S') for dt in request.json['datetimes']]
+        query = Event.query\
+            .join(Tag, Event.id==Tag.event_id)\
+            .join(Datetime, Event.id==Datetime.event_id)\
+            .filter(Event.name.like(search_name))\
+            .filter(Event.place.like(search_place))
+        if search_tags:
+            query = query.filter(Tag.tag.in_(search_tags))
+        if search_dt:
+            query = query.filter(Datetime.datetime.between(search_dt[0], search_dt[1]))
+        filtered_events = query.all()
+        result = events_schema.dump(filtered_events)
+        return jsonify(result)
+
     return app
