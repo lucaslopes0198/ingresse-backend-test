@@ -111,6 +111,20 @@ class EventTestCase(unittest.TestCase):
         res_json = json.loads(response.data)
         self.assertEqual(res_json[0]['interested'], 1)
 
+    def test_event_delete(self):
+        """Test API can delete an existing event."""
+        # Creating event
+        response = self.client.post('/events',
+                                    json=self.test_event)
+        self.assertEqual(response.status_code, 200)
+        # Deleting event by id
+        response = self.client.delete('/events/1')
+        self.assertEqual(response.status_code, 200)
+        # Test to see if it exists, should return a empty list
+        response = self.client.get('/events')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json), 0)
+
     def tearDown(self):
         with self.app.app_context():
             # drop all tables

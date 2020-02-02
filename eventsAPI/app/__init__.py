@@ -107,4 +107,13 @@ def create_app(config_name):
         result = event_schema.dump(event)
         return jsonify(result)
 
+    @app.route('/events/<int:id>', methods=['DELETE'])
+    def delete_event(id):
+        event = Event.query.filter_by(id=id).first()
+        db.session.delete(event)
+        db.session.commit()
+        return {
+            "msg": "event {} deleted successfully".format(id) 
+        }
+
     return app
