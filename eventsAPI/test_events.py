@@ -91,7 +91,7 @@ class EventTestCase(unittest.TestCase):
         response = self.client.post('/events',
                                     json=self.test_event)
         self.assertEqual(response.status_code, 200)
-        update = {'name': 'Name updated', 'tags': ['Tag1 updated', 'Tag2 updated'], 'datetimes': ['02/02/20 20:02:00', '04/02/20 23:30:00', '02/03/20 19:00:00']}
+        update = {'name': 'Name updated', 'place': 'Place updated', 'tags': ['Tag1 updated', 'Tag2 updated'], 'datetimes': ['02/02/20 20:02:00', '04/02/20 23:30:00', '02/03/20 19:00:00']}
         # Updating name, tag and datetime
         response = self.client.put('/events/1',
                                    json=update)
@@ -100,6 +100,7 @@ class EventTestCase(unittest.TestCase):
         response = self.client.get('/events')
         res_json = json.loads(response.data)
         self.assertEqual('Name updated', res_json[0]['name'])
+        self.assertEqual('Place updated', res_json[0]['place'])
         self.assertEqual(len(res_json[0]['tags']), 2)
         self.assertEqual(len(res_json[0]['datetimes']), 3)
         # Updating interested
@@ -130,7 +131,3 @@ class EventTestCase(unittest.TestCase):
             # drop all tables
             db.session.remove()
             db.drop_all()
-
-
-if __name__ == "__main__":
-    unittest.main()

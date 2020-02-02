@@ -13,6 +13,7 @@ marshmallow-sqlalchemy = "*"
 pipfile = "*"
 python-dotenv = "*"
 flask-api = "*"
+coverage = "*"
 
 [requires]
 python_version = "3.7"

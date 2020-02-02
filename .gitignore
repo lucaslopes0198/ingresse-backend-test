@@ -1,2 +1,9 @@
-*.pyc
+# Byte-compiled
+__pycache__/
+
+# vscode project settings
 .vscode
+
+# Coverage reports
+htmlcov/
+.coverage
