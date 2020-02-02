@@ -1,4 +1,4 @@
-from flask import request, jsonify, abort
+from flask import request, jsonify
 from flask_api import FlaskAPI
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -49,8 +49,8 @@ def create_app(config_name):
         result = events_schema.dump(all_events)
         return jsonify(result)
 
-    @app.route('/events/filters', methods=['POST'])
-    def get_filtered_events():
+    @app.route('/events/filters', methods=['GET'])
+    def get_filtered_events(**kwargs):
         search_name = "%{}%".format(request.json.get('name', ''))
         search_place = "%{}%".format(request.json.get('place', ''))
         search_tags = request.json.get('tags', '')

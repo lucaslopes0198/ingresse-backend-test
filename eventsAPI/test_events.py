@@ -59,7 +59,7 @@ class EventTestCase(unittest.TestCase):
 
         # Creating filters for first filtered search
         filters = {'name': 'Test1', 'datetimes': ['01/01/20 17:30:00', '01/02/20 17:30:00']}
-        response = self.client.post('/events/filters',
+        response = self.client.get('/events/filters',
                                     json=filters)
         res_json = json.loads(response.data)
         # Testing first filtered response
@@ -76,7 +76,7 @@ class EventTestCase(unittest.TestCase):
         
         # Creating filters for second filtered search
         filters = {'tags': ['Test1 t1']}
-        response = self.client.post('/events/filters',
+        response = self.client.get('/events/filters',
                                     json=filters)
         res_json = json.loads(response.data)
         # Testing second filtered response
