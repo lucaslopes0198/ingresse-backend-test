@@ -103,14 +103,20 @@ class EventTestCase(unittest.TestCase):
         self.assertEqual('Place updated', res_json[0]['place'])
         self.assertEqual(len(res_json[0]['tags']), 2)
         self.assertEqual(len(res_json[0]['datetimes']), 3)
-        # Updating interested
+        # Testing increase interested
         response = self.client.put('/events/1',
                                    json={'interested': True})
         self.assertEqual(response.status_code, 200)
         # Get updated event
         response = self.client.get('/events')
-        res_json = json.loads(response.data)
-        self.assertEqual(res_json[0]['interested'], 1)
+        self.assertEqual(response.json[0]['interested'], 1)
+        # Testing decrease interested
+        response = self.client.put('/events/1',
+                                   json={'interested': False})
+        self.assertEqual(response.status_code, 200)
+        # Get updated event
+        response = self.client.get('/events')
+        self.assertEqual(response.json[0]['interested'], 0)
 
     def test_event_delete(self):
         """Test API can delete an existing event."""

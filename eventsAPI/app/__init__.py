@@ -73,9 +73,11 @@ def create_app(config_name):
     def update_event(id, **kwargs):
         event = Event.query.filter_by(id=id).first()
         
-        interested = request.json.get('interested', '')
-        if interested:
-            event.interested += 1
+        if 'interested' in request.json:
+            if request.json['interested']:
+                event.interested += 1
+            else:
+                event.interested -= 1
             db.session.add(event)
             db.session.commit()
             result = event_schema.dump(event)
@@ -113,7 +115,8 @@ def create_app(config_name):
         db.session.delete(event)
         db.session.commit()
         return {
-            "msg": "event {} deleted successfully".format(id) 
+            "msg": "event deleted successfully",
+            "id": id 
         }
 
     return app
