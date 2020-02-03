@@ -3,115 +3,165 @@
 ## Installation / Usage events API
 
 * Ensure you have installed pipenv. If not, run this:
-	```sh
+	```
 	$ pip install pipenv
 	```
 *  Git clone this repo:
-	```sh
+	```
 	$ git clone https://github.com/lucaslopes0198/ingresse-backend-test.git
 	```
 
 * **Dependencies**
 	* cd into eventsAPI as such:
-		```sh
+		```
 		$ cd ingresse-backend-test/eventsAPI
 		```
 	* Install pipfile:
-		```sh
+		```
 		$ pipenv install Pipfile
 		```
 	* Activate your virtual environment:
-		```sh
+		```
 		$ pipenv shell
 		```
 
-#### For the next steps, make sure you are in the virtual environment.
+#### For the next steps, make sure you are in the virtual environment and in the eventsAPI folder.
 
 * **Testing API**
-	* To run tests, ensure you are in the eventsAPI folder and run:
-		```sh
+	* To run tests:
+		```
 		(eventsAPI) $ coverage run -m unittest discover
 		```
 	* View the report in terminal:
-		```sh
+		```
 		(eventsAPI) $ coverage report
 		```
 	* Generate a html report:
-		```sh
+		```
 		(eventsAPI) $ coverage html
 		```
 	* You can find the html in the `htmlcov` folder and view it by opening `index.html` in your browser.
 
 * **Database**
-	* To create the database, ensure you are in the eventsAPI folder and run:
-		```sh
+	* To create the database, run:
+		```
 		(eventsAPI) $ python db_create.py
 		```
 * **Running it**
 	* Run the server using this command:
-		```sh
+		```
 		(eventsAPI) $ flask run
 		```
 * **Endpoints**
-	* You can create an event using POST method:
-		```sh
-		http://localhost:5000/events
+	* Base endpoint:
 		```
-	* Payload example to create an event:
-		```json
+		http://localhost:5000
+		```
+	* Request Syntax to create an event:
+		```
+		response = client.post(
+			"/events",
+			json={
+				"name": "String",
+				"place": "String",
+				"tags": [
+					"String",
+				],
+				"datetimes": [
+					"String", # dd/mm/yy H:M:S
+				]
+			}
+		)
+		```
+
+	* Request Syntax to get all events:
+		```
+		response = client.get("/events")
+		```
+
+	* Request Syntax to get filtered events:
+		```
+		response = client.get(
+			"/events/filters",
+			json={
+				"name": "String",
+				"tags": [
+					"String",
+				],
+				"datetimes": [
+					"String", # dd/mm/yy H:M:S
+					"String", # dd/mm/yy H:M:S
+				]
+			}
+		)
+		```
+
+	* Request Syntax to update an event:
+		```
+		response = client.put(
+			"/events/<id>",
+			json={
+				"name": "String",
+				"tags": [
+					"String",
+				]
+			}
+		)
+		```
+
+	* Request Syntax to update interested:
+		```
+		response = client.put(
+			"/events/<id>",
+			json={
+				"interested": "bool", # True=increase, False=decrease
+			}
+		)
+		```
+
+	* Request Syntax to delete an event:
+		```
+		response = client.delete("/events/<id>")
+		```
+
+	* Response Syntax to create an event:
+	```
+	{
+		"datetimes": [
+			"String",
+		],
+		"id": Int,
+		"interested": Int,
+		"name": "String",
+		"place": "String",
+		"tags": [
+			"String",
+		]
+	}
+	```
+
+	* Response Syntax to get and update events:
+	```
+	[
 		{
-			"name": "Test1 event",
-			"place": "Test1 place",
-			"tags": [
-				"Test1 t1",
-				"Test1 t2"
-			],
 			"datetimes": [
-				"01/01/19 20:30:00",
-				"02/01/19 22:00:00"
-			]
-		}
-		```
-
-	* You can get all events using GET method:
-		```sh
-		http://localhost:5000/events
-		```
-
-	* You can get filtered events using GET method:
-		```sh
-		http://localhost:5000/events/filters
-		```
-	* Payload example to get filtered events:
-		```json
-		{
-			"name": "Test1 event",
-			"tags": [
-				"Test1 t1",
+				"String",
 			],
-			"datetimes": [
-				"01/01/19 20:30:00",
-				"02/01/19 22:00:00"
-			]
-		}
-		```
-
-	* You can update an event using PUT method:
-		```sh
-		http://localhost:5000/events
-		```
-	* Payload example to update an event:
-		```json
-		{
-			"name": "Name updated",
+			"id": Int,
+			"interested": Int,
+			"name": "String",
+			"place": "String",
 			"tags": [
-				"Tag1 updated",
-				"Tag2 updated"
+				"String",
 			]
-		}
-		```
+		},
+	]
+	```
 
-	* You can delete an event using DELETE method by ID:
-		```sh
-		http://localhost:5000/events/<id>
-		```
+	* Response Syntax to delete an event:
+	```
+	{
+		"msg": "event deleted successfully",
+		"id": Int
+	}
+	```
